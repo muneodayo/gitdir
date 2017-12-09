@@ -31,7 +31,7 @@ def usage():
     print "Examples: "
     print "Netcat.py -t 192.168.0.1 -p 5555 -l -c"
     print "Netcat.py -t 192.168.0.1 -p 5555 -l -c -u c:\\target.exe"
-    print "Netcat.py -t 192.168.0.1 -p 5555 -l -c \"cat /etc/passwd""
+    print "Netcat.py -t 192.168.0.1 -p 5555 -l -e \"cat /etc/passwd""
     print "echo 'ABCDEFGHI' | ./Netcat.py -t 192.168.11.12 -p 135"
     sys.exit(0)
 
