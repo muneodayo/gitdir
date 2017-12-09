@@ -31,7 +31,7 @@ def usage():
     print "Examples: "
     print "Netcat.py -t 192.168.0.1 -p 5555 -l -c"
     print "Netcat.py -t 192.168.0.1 -p 5555 -l -c -u c:\\target.exe"
-    print "Netcat.py -t 192.168.0.1 -p 5555 -l -e \"cat /etc/passwd""
+    print "Netcat.py -t 192.168.0.1 -p 5555 -l -e \"cat /etc/passwd\""
     print "echo 'ABCDEFGHI' | ./Netcat.py -t 192.168.11.12 -p 135"
     sys.exit(0)
 
@@ -56,11 +56,13 @@ def main():
     for o, a in opts:
         if o in ("-h", "--help"):
             usage()
-        if 0 in ("-l", "--listen"):
+        if o in ("-l", "--listen"):
             listen = True
+        if o in ("-e", "--execute"):
+            execute = a
         if o in ("-c", "--command"):
             command = True
-        if 0 in ("-u", "--upload"):
+        if o in ("-u", "--upload"):
             upload_destination = a
         if o in ("-t", "--target"):
             target = a
@@ -119,11 +121,11 @@ def client_sender(buffer):
            #データの送信
             client.send(buffer)
 
-        except:
-            print "    [*]   Exception: Existing. "
+    except:
+        print "    [*]   Exception: Existing. "
             
-            #接続の終了
-            client.close()
+        #接続の終了
+        client.close()
     
 def server_loop():
     global target
@@ -202,7 +204,7 @@ if len(execute):
 if command:
 
     #プロンプトの表示
-    prompt = <"BHP:#">
+    prompt = "<BHP:#>"
     client_socket.send(prompt)
 
     while True:
