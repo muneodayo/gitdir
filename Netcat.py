@@ -22,7 +22,7 @@ def usage():
     print "BHP Net Tool"
     print
     print "Usage: Netcat.py -t target_host -p port"
-    print "-l listen                           - listen on [host]  : [port] for incoming connection"
+    print "-l listen                           - listen on [host]  : [port] for incoming connections"
     print "-e execution                    - execute the given file upon receiving connection"
     print "-c --command                 - initialize a command shell"
     print "-u --upload=destination   -upon receving connection upload a file and write to [destination]"
@@ -34,6 +34,26 @@ def usage():
     print "Netcat.py -t 192.168.0.1 -p 5555 -l -e \"cat /etc/passwd\""
     print "echo 'ABCDEFGHI' | ./Netcat.py -t 192.168.11.12 -p 135"
     sys.exit(0)
+
+def server_loop():
+    global target
+
+    #待機するIPアドレスが指定されていない場合はすべてのインターフェースで待機する。
+    if not len(target):
+        target = "0.0.0.0"
+
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.bind((target, port))
+
+    server.listen(5)
+
+    while True:
+        client_socket, addr = server.accept()
+
+        #クライエントからの新しい接続を処理するスレッドの起動
+        client_thread = threading.Thread(target=client_handler, args=(client_socket, ))
+        client_thread.start()
+
 
 def main():
     global listen
@@ -56,17 +76,17 @@ def main():
     for o, a in opts:
         if o in ("-h", "--help"):
             usage()
-        if o in ("-l", "--listen"):
+        elif o in ("-l", "--listen"):
             listen = True
-        if o in ("-e", "--execute"):
+        elif o in ("-e", "--execute"):
             execute = a
-        if o in ("-c", "--command"):
+        elif o in ("-c", "--command"):
             command = True
-        if o in ("-u", "--upload"):
+        elif o in ("-u", "--upload"):
             upload_destination = a
-        if o in ("-t", "--target"):
+        elif o in ("-t", "--target"):
             target = a
-        if o in ("-p", "--port"):
+        elif o in ("-p", "--port"):
             port = int(a)
         else:
             assert False, "Unhandled Option"
@@ -127,25 +147,6 @@ def client_sender(buffer):
         #接続の終了
         client.close()
     
-def server_loop():
-    global target
-
-    #待機するIPアドレスが指定されていない場合はすべてのインターフェースで待機する。
-    if not len(target):
-        target = "0.0.0.0"
-
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind((target, port))
-
-    server.listen(5)
-
-    while True:
-        client_socket, addr = server.accpt()
-
-        #クライエントからの新しい接続を処理するスレッドの起動
-        client_thread = threading.Thread(target=client_handler, args=(client_socket, ))
-        client_thread.start()
-
 def run_command(command):
     #文字列の末尾の改行を削除
     command = command.rstrip()
@@ -154,7 +155,7 @@ def run_command(command):
     try:
         output = subprocess.check_output(command, err=subproces.STDOUT, shell=True)
     except:
-        output = "Fauiled to execute command.\r\n"
+        output = "Failed to execute command.\r\n"
     
     #出力結果をクライエントに送信
     return output
