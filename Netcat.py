@@ -106,11 +106,10 @@ def main():
     if  listen:
         server_loop()
 
-main()
 
 def client_sender(buffer):
 
-    client = socket.socket(socket.AF_INET, socket.SOCK_STEREAM)
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     try:
         #標的ホストへの接続
@@ -221,6 +220,9 @@ if command:
 
         #コマンドの実行結果を送信
         client_socket.send(response)
+
+if __name__=='__main__':
+    main()
 
 #EOF
 
