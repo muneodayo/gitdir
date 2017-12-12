@@ -44,12 +44,12 @@ def server_loop():
 
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind((target, port))
-
+    print u"サーバー待機開始...\n".encode('cp932')
     server.listen(5)
-
+    print u"サーバー待機中...\n" .encode('cp932')
     while True:
         client_socket, addr = server.accept()
-
+        print u"新しい接続を処理するスレッドを起動しています...".encode('cp932')
         #クライエントからの新しい接続を処理するスレッドの起動
         client_thread = threading.Thread(target=client_handler, args=(client_socket, ))
         client_thread.start()
@@ -98,6 +98,7 @@ def main():
         buffer = sys.stdin.read()
 
         #データ送信
+        print u"データを送信しています...\n".encode('cp932')
         client_sender(buffer) 
 
     #接続待機を開始。
@@ -108,7 +109,9 @@ def main():
 
 
 def client_sender(buffer):
-
+"""
+クライエントとやり取りする。
+"""
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     try:
@@ -120,6 +123,7 @@ def client_sender(buffer):
 
         while True:
             #標的ホストからのデータの待機
+            print u"標的ホストからのデータを待機しています...\n".encode('cp932')
             recv_len = 1
             response = ""
 
@@ -129,7 +133,9 @@ def client_sender(buffer):
                 response += data
 
                 if recv_len < 4096:
-                    break
+                    print u"標的ホストからのデータはありませんでした\n".encode('cp932')
+                    sys.exit(0)
+                    #break
 
             print response,
 
@@ -152,7 +158,7 @@ def run_command(command):
 
     #コマンドを実行し出力結果を取得
     try:
-        output = subprocess.check_output(command, err=subproces.STDOUT, shell=True)
+        output = subprocess.call(command)
     except:
         output = "Failed to execute command.\r\n"
     
@@ -160,6 +166,10 @@ def run_command(command):
     return output
 
 def client_handler(client_socket):
+    
+    """
+    ファイルのアップロード、コマンド実行、コマンドシェルの実行
+    """
     global upload
     global command
     global execute
@@ -179,6 +189,7 @@ def client_handler(client_socket):
             
             else:
                 file_buffer += data
+                print u"アップロードしたファイルを読み込みました.\n".encode('cp932')
         
         #受信したデータをファイルに書き込み
         try:
@@ -202,7 +213,7 @@ if len(execute):
 
 #コマンド実行をされているかどうかの確認
 if command:
-
+    print u"プロンプトを表示します...\n".encode('cp932')
     #プロンプトの表示
     prompt = "<BHP:#>"
     client_socket.send(prompt)
